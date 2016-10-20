@@ -1,4 +1,5 @@
 import os, sys
+sys.path.append(os.path.dirname(__file__))
 import paramiko
 from paramiko.resource import ResourceManager
 from paramiko.transport import Transport

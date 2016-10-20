@@ -1,7 +1,7 @@
 import os, sys
 
-import local_process
-import remote_process
+from . import local_process
+from . import remote_process
 import subprocess
 
 class GDBProcess:

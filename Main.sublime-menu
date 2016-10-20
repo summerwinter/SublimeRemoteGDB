@@ -12,20 +12,20 @@
                 "children":
                 [
                     {
-                        "caption": "SublimeGDB",
+                        "caption": "SublimeRemoteGDB",
                         "children":
                         [
                             {
                                 "command": "open_file", "args":
                                 {
-                                    "file": "${packages}/SublimeGDB/SublimeGDB.sublime-settings"
+                                    "file": "${packages}/SublimeRemoteGDB/SublimeRemoteGDB.sublime-settings"
                                 },
                                 "caption": "Settings – Default"
                             },
                             {
                                 "command": "open_file", "args":
                                 {
-                                    "file": "${packages}/User/SublimeGDB.sublime-settings"
+                                    "file": "${packages}/User/SublimeRemoteGDB.sublime-settings"
                                 },
                                 "caption": "Settings – User"
                             },
@@ -33,7 +33,7 @@
                             {
                                 "command": "open_file", "args":
                                 {
-                                    "file": "${packages}/SublimeGDB/Default.sublime-keymap"
+                                    "file": "${packages}/SublimeRemoteGDB/Default.sublime-keymap"
                                 },
                                 "caption": "Key Bindings – Default"
                             },

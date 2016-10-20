@@ -1,7 +1,7 @@
 import os, sys
 
-import local_process
-import nested_paramiko
+from . import local_process
+from . import nested_paramiko
 from plugin_ssh_config import *
 
 last_nested_paramiko = {"config": None, "nested_paramiko": None}
