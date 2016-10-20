@@ -1426,6 +1426,14 @@ def gdboutput(pipe):
         except:
             traceback.print_exc()
     if pipe == gdb_process.stdout:
+
+        # save current layout to config file when exit sublimeGDB
+        gdb_bkp_layout = gdb_bkp_window.get_layout()
+        s = sublime.load_settings("SublimeGDB.sublime-settings")
+        layout = gdb_bkp_layout
+        s.set("layout", layout)
+        sublime.save_settings("SublimeGDB.sublime-settings")
+
         log_debug("GDB session ended\n")
         gdb_session_view.add_line("GDB session ended\n")
         sublime.set_timeout(session_ended_status_message, 0)
