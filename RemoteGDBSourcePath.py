@@ -120,7 +120,6 @@ obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/
 path = obj1.translate_remote_path("/home/leiwang/ht/../../Users/leiwang/ht/dir/common/src/select/Ads_Selector.cpp")
 path = obj1.simplifyPath(path);
 print(path)
-"""
 
 #obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
 obj1 = RemoteGDBSourcePath()
@@ -129,3 +128,4 @@ obj1.init("remote", True, prefix_postfix_list, "/Users/leiwang/ht/dir");
 path = obj1.translate_local_path("/Users/leiwang/ht/../../Users/leiwang/ht/dir/1.cpp")
 print(path)
 obj1.update_dictionary_file("/Users/leiwang/ht/dir")
+"""
