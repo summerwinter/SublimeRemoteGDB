@@ -2,16 +2,20 @@
 import os
 
 class RemoteGDBSourcePath:
-    #dictionary = {}
-    def __init__(self, debug_mode="local", auto_substitute=False, local_prefix_path=None, remote_prefix_path=None, project_path=""):
+    dictionary = {}
+    def __init__(self):
+        pass
+
+    def init(self, debug_mode="local", auto_substitute=False, prefix_postfix_list=None, remote_prefix_path=None, project_path=""):
         self.debug_mode = debug_mode
         self.auto_substitute = auto_substitute
-        self.local_prefix_path = local_prefix_path
-        self.remote_prefix_path = remote_prefix_path
-        self.auto_subsitute = auto_substitute
+        if prefix_postfix_list is not None:
+            self.local_prefix_path = prefix_postfix_list[0]
+            self.remote_prefix_path = prefix_postfix_list[1]
+        self.project_path = project_path
         if self.auto_substitute == True:
-            self.dictionary = self.build_dictionary(project_path)
-
+            if self.dictionary is {}:
+                self.dictionary = self.build_dictionary(project_path)
 
     def translate_local_path(self,local_path):
         if self.debug_mode == "local":
@@ -116,9 +120,12 @@ obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/
 path = obj1.translate_remote_path("/home/leiwang/ht/../../Users/leiwang/ht/dir/common/src/select/Ads_Selector.cpp")
 path = obj1.simplifyPath(path);
 print(path)
+"""
 
-obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
+#obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
+obj1 = RemoteGDBSourcePath()
+prefix_postfix_list = ["/Users/leiwang", "/home/leiwang"]
+obj1.init("remote", True, prefix_postfix_list, "/Users/leiwang/ht/dir");
 path = obj1.translate_local_path("/Users/leiwang/ht/../../Users/leiwang/ht/dir/1.cpp")
 print(path)
 obj1.update_dictionary_file("/Users/leiwang/ht/dir")
-"""
