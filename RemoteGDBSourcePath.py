@@ -21,7 +21,8 @@ class RemoteGDBSourcePath:
             self.simplifyPath(translated_path)
             return translated_path
         else:
-            return local_path.split("/")[-1]
+            path_list = local_path.split("/")
+            return path_list[-1]
 
 
     def translate_remote_path(self, remote_path):
@@ -58,26 +59,42 @@ class RemoteGDBSourcePath:
     def walk_dir(self, dir,fileinfo,topdown=True):
         for root, dirs, files in os.walk(dir, topdown):
             for name in files:
-                if name.endswith(".c") or name.endswith(".C") or name.endswith(".cc") or name.endswith(".cpp") or name.endswith(".cxx") or name.endswith(".h") or name.endswith(".hpp") or name.endswith(".inl"):
-                    fileinfo.write(name + " " + os.path.join(root,name) + '\n')
+                str_list = name.split(".")
+                suffix = str_list[-1]
+                source_file_suffix_list = ["c", "C", "cc", "cpp", "cxx", "h", "hpp", "inl"]
+                if suffix in source_file_suffix_list:
+                    fileinfo.write(name + " " + os.path.join(root, name) + '\n')
 
 
     def build_dictionary(self, project_path):
-        dictionary_file = project_path + "/index.txt"
+        dictionary_file = project_path + "/.SublimeRemoteGDB.index"
         fileinfo = None
         #dictionary = None
         dictionary = {}
         if os.path.isfile(dictionary_file) == False:
             fileinfo = open(dictionary_file,"w+")
             self.walk_dir(project_path, fileinfo)
-        if fileinfo == None:
-            fileinfo = open(dictionary_file, 'r')
+            fileinfo.close()
+            #fileinfo.flush()
+        #if fileinfo == None:
+        fileinfo = open(dictionary_file, 'r')
         for line in fileinfo:
             line=line.strip('\n')
             list = line.split(" ")
             dictionary[list[0]] = list[1]
         fileinfo.close()
         return dictionary
+
+    def update_dictionary_file(self, project_path):
+        dictionary_file = project_path + "/.SublimeRemoteGDB.index"
+        fileinfo = open(dictionary_file, "w+")
+        self.walk_dir(project_path, fileinfo)
+        for line in fileinfo:
+            line = line.strip('\n')
+            list = line.split(" ")
+            this.dictionary[list[0]] = list[1]
+        fileinfo.close()
+        return
 
 
 """
@@ -91,13 +108,17 @@ obj1 = RemoteGDBSourcePath("remote", False, "/Users/leiwang", "/home/leiwang");
 path = obj1.translate_remote_path("/home/leiwang/ht/../../Users/leiwang/ht/dir/1.cpp")
 path = obj1.simplifyPath(path);
 print(path)
+"""
 
-obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
-path = obj1.translate_remote_path("/home/leiwang/ht/../../Users/leiwang/ht/dir/1.cpp")
+"""
+#obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
+obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/Documents/code/common");
+path = obj1.translate_remote_path("/home/leiwang/ht/../../Users/leiwang/ht/dir/common/src/select/Ads_Selector.cpp")
 path = obj1.simplifyPath(path);
 print(path)
 
 obj1 = RemoteGDBSourcePath("remote", True, "/Users/leiwang", "/home/leiwang", "/Users/leiwang/ht/dir");
 path = obj1.translate_local_path("/Users/leiwang/ht/../../Users/leiwang/ht/dir/1.cpp")
 print(path)
+obj1.update_dictionary_file("/Users/leiwang/ht/dir")
 """
