@@ -66,7 +66,6 @@ def get_project_dir():
     if not view:
         return None
     fn = view.file_name()
-    print(fn)
     if not fn:
         return None
     fn = normalize(fn)
@@ -112,7 +111,8 @@ def generate_gdb_process():
         return False
 
     global gdb_source_path
-    gdb_source_path.init(local_remote_mode, auto_substitute, substitute_path)
+    gdb_source_path.init(local_remote_mode, auto_substitute, substitute_path, project_dir)
+
     
     print(substitute_path)
 
@@ -1415,6 +1415,7 @@ def update_view_markers(view=None):
     fn = view.file_name()
     if fn is not None:
         fn = normalize(fn)
+        sublime.status_message(fn)
     pos_scope = get_setting("position_scope", "entity.name.class")
     pos_icon = get_setting("position_icon", "bookmark")
 
@@ -1797,8 +1798,8 @@ class GdbLaunch(sublime_plugin.WindowCommand):
             return
 
         generate_gdb_process()
-
-        print(gdb_process.exec_command("pwd"))
+        # return
+        
         print(gdb_process._commandline)
         
         if gdb_process.valid():
@@ -1844,7 +1845,7 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         view = self.window.active_view()
         # DEBUG = get_setting("debug", False, view)
         # DEBUG = True
-        # DEBUG_FILE = "/Users/xdwang/gdb.txt"
+        # DEBUG_FILE = "stdout"
         # DEBUG_FILE = expand_path(get_setting("debug_file", "stdout", view), self.window)
         # if DEBUG:
         #     print("Will write debug info to file: %s" % DEBUG_FILE)
@@ -1972,8 +1973,10 @@ class GdbLaunch(sublime_plugin.WindowCommand):
 
         gdb_breakpoint_view.sync_breakpoints()
 
-        if gdb_settings.get("debug_mode") in ["attach", "coredump"]:
+        if gdb_settings.get("debug_mode") == "attach":
             gdb_run_status = "running"
+        elif gdb_settings.get("debug_mode") == "coredump":
+            gdb_run_status = "stopped"
         else:
             if(get_setting("run_after_init", True)):
                 gdb_run_status = "running"
@@ -1983,7 +1986,11 @@ class GdbLaunch(sublime_plugin.WindowCommand):
                 run_cmd(get_setting("exec_cmd", "-exec-run"), True)
             else:
                 gdb_run_status = "stopped"
-        
+
+
+        if gdb_settings.get("debug_mode") == "coredump":
+            run_cmd("core %s" % gdb_settings.get("coredump.coredump_file"))
+            update_cursor()
 
 
         show_input()

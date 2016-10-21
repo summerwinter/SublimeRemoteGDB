@@ -2,7 +2,7 @@
 import os
 
 class RemoteGDBSourcePath:
-    dictionary = {}
+    dictionary = None
     def __init__(self):
         pass
 
@@ -13,8 +13,9 @@ class RemoteGDBSourcePath:
             self.local_prefix_path = prefix_postfix_list[0]
             self.remote_prefix_path = prefix_postfix_list[1]
         self.project_path = project_path
+
         if self.auto_substitute == True:
-            if self.dictionary is {}:
+            if self.dictionary is None:
                 self.dictionary = self.build_dictionary(project_path)
 
     def translate_local_path(self,local_path):
