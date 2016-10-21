@@ -1,0 +1,27 @@
+{
+	"gdb_path": "/usr/local/bin/gdb",
+	"local_remote_mode": "local",
+	"debug_mode": "exec",
+	"exec": {
+		"workingdir": "/home/hello/",
+		"executable_file": "hello"
+	},
+	"attach": {
+		"attach_id": "",
+		"attach_keyword": "",
+		"exec_and_symbol_file": ""
+	},
+	"coredump": {
+		"executable_file": "",
+		"coredump_file": ""
+	},
+	"remote_host": "",
+	"remote_ssh_config": [
+		{
+			"hostname": "",
+			"username": ""
+		}
+	],
+	"substitute_path": ["/local/codepath", "/remote/codepath"],
+	"auto_substitute": 0
+}

@@ -11,7 +11,7 @@ class RemoteGDBSettings:
             self.load_settings(project_dir)
 
     def load_settings(self, project_dir):
-        project_setting_file = os.path.join(project_dir, ".remotegdb.json")
+        project_setting_file = RemoteGDBSettings.project_setting_file(project_dir)
         if not os.path.exists(project_setting_file):
             return False
 
@@ -19,10 +19,14 @@ class RemoteGDBSettings:
             with open(project_setting_file) as data_file:
                 self.data = json.load(data_file)
         except Exception:
-            sublime.error_message("some errors exist in project setting file!")
+            # sublime.error_message("some errors exist in project setting file!")
             return False
 
         return True
+
+    @staticmethod
+    def project_setting_file(project_dir):
+        return os.path.join(project_dir, ".remotegdb.json")
 
     def get(self, key, default_value=None):
         keys = key.split(".")

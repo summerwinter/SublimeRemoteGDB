@@ -66,6 +66,7 @@ def get_project_dir():
     if not view:
         return None
     fn = view.file_name()
+    print(fn)
     if not fn:
         return None
     fn = normalize(fn)
@@ -75,7 +76,7 @@ def get_project_dir():
         return None
 
     for folder in folders:
-        if fn.startswith(folder):
+        if fn.startswith(folder + os.sep):
             return folder
 
     return None
@@ -89,6 +90,11 @@ gdb_settings = RemoteGDBSettings()
 gdb_process = GDBProcess()
 gdb_source_path = RemoteGDBSourcePath()
 
+class GdbSetViewContent(sublime_plugin.TextCommand):
+    def run(self, edit, text):
+        self.view.erase(edit, sublime.Region(0, self.view.size()))
+        self.view.insert(edit, 0, text)
+
 def generate_gdb_process():
     project_dir = get_project_dir()
     # print(project_dir)
@@ -96,7 +102,19 @@ def generate_gdb_process():
         sublime.error_message("can't find the project dir, I don't know which folder you are in!")
         return False
     
-    gdb_settings.load_settings(project_dir)
+    print(project_dir)
+    if gdb_settings.load_settings(project_dir) == False:
+        sublime.error_message("load project config file failed!")
+        project_setting_file = RemoteGDBSettings.project_setting_file(project_dir)
+        if os.path.exists(project_setting_file):
+            sublime.active_window().open_file(project_setting_file, sublime.ENCODED_POSITION)
+        else:
+            # project_config_view = sublime.active_window().new_file(project_setting_file)
+            project_config_view = sublime.active_window().open_file(project_setting_file, sublime.ENCODED_POSITION)
+            data = open(os.path.join(sublime.packages_path(), "SublimeRemoteGDB/.remotegdb.json"), "r").read()
+            project_config_view.run_command("gdb_set_view_content", {"text": data})
+
+        return False
 
     local_remote_mode = gdb_settings.get("local_remote_mode")
     if local_remote_mode is None or local_remote_mode not in ["local", "remote"]:
@@ -1786,7 +1804,6 @@ def programio(pty, tty):
 gdb_input_view = None
 gdb_command_history = []
 gdb_command_history_pos = 0
-
 
 def set_input(edit, text):
     gdb_input_view.erase(edit, sublime.Region(0, gdb_input_view.size()))
