@@ -155,7 +155,7 @@
     "console_open": true,
 
     "variables_group": 1,
-    "variables_open": true,
+    "variables_open": false,
 
     "callstack_group": 2,
     "callstack_open": true,

@@ -312,6 +312,9 @@ gdb_shutting_down = False
 gdb_server_process = None
 gdb_stack_frame = None
 gdb_stack_index = 0
+gdb_global_lock = threading.Lock()
+gdb_global_clean_count = 0
+gdb_global_command_input_focused = False
 
 gdb_nonstop = False
 
@@ -1415,7 +1418,6 @@ def update_view_markers(view=None):
     fn = view.file_name()
     if fn is not None:
         fn = normalize(fn)
-        sublime.status_message(fn)
     pos_scope = get_setting("position_scope", "entity.name.class")
     pos_icon = get_setting("position_icon", "bookmark")
 
@@ -1535,6 +1537,10 @@ def update_cursor():
         gdb_cursor_position = int(currFrame["line"])
         sublime.active_window().focus_group(get_setting("file_group", 0))
         sublime.active_window().open_file("%s:%d" % (gdb_cursor, gdb_cursor_position), sublime.ENCODED_POSITION)
+        global gdb_global_command_input_focused
+        if gdb_global_command_input_focused == True:
+            sublime.active_window().focus_view(gdb_input_view)
+            gdb_global_command_input_focused = False
     else:
         gdb_cursor_position = 0
 
@@ -1612,12 +1618,14 @@ def gdboutput(pipe):
             traceback.print_exc()
     if pipe == gdb_process.stdout:
 
+
+
         # save current layout to config file when exit sublimeGDB
-        gdb_bkp_layout = gdb_bkp_window.get_layout()
-        s = sublime.load_settings("SublimeGDB.sublime-settings")
-        layout = gdb_bkp_layout
-        s.set("layout", layout)
-        sublime.save_settings("SublimeGDB.sublime-settings")
+        # gdb_bkp_layout = gdb_bkp_window.get_layout()
+        # s = sublime.load_settings("SublimeGDB.sublime-settings")
+        # layout = gdb_bkp_layout
+        # s.set("layout", layout)
+        # sublime.save_settings("SublimeGDB.sublime-settings")
 
         log_debug("GDB session ended\n")
         gdb_session_view.add_line("GDB session ended\n")
@@ -1634,6 +1642,42 @@ def gdboutput(pipe):
     sublime.set_timeout(cleanup, 0)
 
 def cleanup():
+    global gdb_global_clean_count
+    with gdb_global_lock:
+        if gdb_global_clean_count == 1:
+            gdb_global_clean_count = 0
+        else:
+            gdb_global_clean_count = 1
+
+            print(gdb_bkp_window.num_groups())
+            currentLayout = gdb_bkp_window.get_layout()
+            s = sublime.load_settings("SublimeRemoteGDB.sublime-settings")
+            s.set("layout",currentLayout)
+
+            log_debug(str(gdb_bkp_window.num_groups()))
+            log_debug("\n")
+            gdb_allview = gdb_bkp_window.views()
+            for v in gdb_allview:
+                if v.name().find("Callstack") != -1:
+                    s.set("callstack_group",gdb_bkp_window.get_view_index(v)[0])
+
+                if v.name().find("Console") != -1:
+                    s.set("console_group",gdb_bkp_window.get_view_index(v)[0])
+
+                if v.name().find("Session") != -1:
+                    s.set("session_group",gdb_bkp_window.get_view_index(v)[0])
+
+                if v.name().find("Variables") != -1:
+                    s.set("variables_group",gdb_bkp_window.get_view_index(v)[0])
+                
+                if v.name().find("Threads") != -1:
+                    s.set("threads_group",gdb_bkp_window.get_view_index(v)[0])
+                
+                if v.name().find("Breakpoints") != -1:
+                    s.set("breakpoints_group",gdb_bkp_window.get_view_index(v)[0])
+
+            sublime.save_settings("SublimeRemoteGDB.sublime-settings")
+    
     global __debug_file_handle
     if get_setting("close_views", True):
         for view in gdb_views:
@@ -1651,7 +1695,18 @@ def cleanup():
 
 class GdbClean(sublime_plugin.WindowCommand):
     def run(self):
-        cleanup()
+        def close_view(view):
+            gdb_bkp_window.focus_view(view)
+            gdb_bkp_window.run_command("close")
+
+        for view in gdb_bkp_window.views():
+            if view.name().find("Callback") != -1 or \
+                view.name().find("Console") != -1 or \
+                view.name().find("Session") != -1 or \
+                view.name().find("Variables") != -1 or \
+                view.name().find("Threads") != -1 or \
+                view.name().find("Breakpoints") != -1:
+                close_view(view)
 
     def is_enabled(self):
         return not is_running()
@@ -1758,18 +1813,23 @@ class GdbNextCmd(sublime_plugin.TextCommand):
             set_input(edit, "")
 
 
-def show_input():
+def show_input(focus=False):
     global gdb_input_view
     global gdb_command_history_pos
     gdb_command_history_pos = len(gdb_command_history)
     gdb_input_view = sublime.active_window().show_input_panel("GDB", "", input_on_done, input_on_change, input_on_cancel)
+    if focus == True:
+        sublime.active_window().focus_view(gdb_input_view)
 
 
 
 def input_on_done(s):
+    global gdb_global_command_input_focused
     if s.strip() != "quit":
         show_input()
         gdb_command_history.append(s)
+        gdb_global_command_input_focused = True
+
     run_cmd(s)
 
 
@@ -1787,7 +1847,7 @@ def is_running():
 
 class GdbInput(sublime_plugin.WindowCommand):
     def run(self):
-        show_input()
+        show_input(True)
 
 
 class GdbLaunch(sublime_plugin.WindowCommand):

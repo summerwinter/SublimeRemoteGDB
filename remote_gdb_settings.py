@@ -15,8 +15,12 @@ class RemoteGDBSettings:
         if not os.path.exists(project_setting_file):
             return False
 
-        with open(project_setting_file) as data_file:
-            self.data = json.load(data_file)
+        try:
+            with open(project_setting_file) as data_file:
+                self.data = json.load(data_file)
+        except Exception:
+            sublime.error_message("some errors exist in project setting file!")
+            return False
 
         return True
 
