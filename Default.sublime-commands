@@ -1,84 +1,84 @@
 [
     {
-        "caption": "Preferences: SublimeGDB Settings – Default",
+        "caption": "Preferences: SublimeRemoteGDB Settings – Default",
         "command": "open_file", "args":
         {
-            "file": "${packages}/SublimeGDB/SublimeGDB.sublime-settings"
+            "file": "${packages}/SublimeRemoteGDB/SublimeRemoteGDB.sublime-settings"
         }
     },
     {
-        "caption": "Preferences: SublimeGDB Settings – User",
+        "caption": "Preferences: SublimeRemoteGDB Settings – User",
         "command": "open_file", "args":
         {
-            "file": "${packages}/User/SublimeGDB.sublime-settings"
+            "file": "${packages}/User/SublimeRemoteGDB.sublime-settings"
         }
     },
     {
-        "caption": "SublimeGDB: Show Input Field",
+        "caption": "SublimeRemoteGDB: Show Input Field",
         "command": "gdb_input"
     },
     {
-        "caption": "SublimeGDB: Start Debugging",
+        "caption": "SublimeRemoteGDB: Start Debugging",
         "command": "gdb_launch"
     },
     {
-        "caption": "SublimeGDB: Continue",
+        "caption": "SublimeRemoteGDB: Continue",
         "command": "gdb_continue"
     },
     {
-        "caption": "SublimeGDB: Pause",
+        "caption": "SublimeRemoteGDB: Pause",
         "command": "gdb_pause"
     },
     {
-        "caption": "SublimeGDB: Step Over",
+        "caption": "SublimeRemoteGDB: Step Over",
         "command": "gdb_step_over"
     },
     {
-        "caption": "SublimeGDB: Step Into",
+        "caption": "SublimeRemoteGDB: Step Into",
         "command": "gdb_step_into"
     },
     {
-        "caption": "SublimeGDB: Step Next Instruction",
+        "caption": "SublimeRemoteGDB: Step Next Instruction",
         "command": "gdb_next_instruction"
     },
     {
-        "caption": "SublimeGDB: Step Out",
+        "caption": "SublimeRemoteGDB: Step Out",
         "command": "gdb_step_out"
     },
     {
-        "caption": "SublimeGDB: Stop Debugging",
+        "caption": "SublimeRemoteGDB: Stop Debugging",
         "command": "gdb_exit"
     },
     {
-        "caption": "SublimeGDB: Open Register View",
+        "caption": "SublimeRemoteGDB: Open Register View",
         "command": "gdb_open_register_view"
     },
     {
-        "caption": "SublimeGDB: Open Session View",
+        "caption": "SublimeRemoteGDB: Open Session View",
         "command": "gdb_open_session_view"
     },
     {
-        "caption": "SublimeGDB: Open Console View",
+        "caption": "SublimeRemoteGDB: Open Console View",
         "command": "gdb_open_console_view"
     },
     {
-        "caption": "SublimeGDB: Open Callstack View",
+        "caption": "SublimeRemoteGDB: Open Callstack View",
         "command": "gdb_open_callstack_view"
     },
     {
-        "caption": "SublimeGDB: Open Variables View",
+        "caption": "SublimeRemoteGDB: Open Variables View",
         "command": "gdb_open_variables_view"
     },
     {
-        "caption": "SublimeGDB: Open Disassembly View",
+        "caption": "SublimeRemoteGDB: Open Disassembly View",
         "command": "gdb_open_disassembly_view"
     },
     {
-        "caption": "SublimeGDB: Open Breakpoint View",
+        "caption": "SublimeRemoteGDB: Open Breakpoint View",
         "command": "gdb_open_breakpoint_view"
     },
     {
-        "caption": "SublimeGDB: Open Threads View",
+        "caption": "SublimeRemoteGDB: Open Threads View",
         "command": "gdb_open_threads_view"
     }
 ]

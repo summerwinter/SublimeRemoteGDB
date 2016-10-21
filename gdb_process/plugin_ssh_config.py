@@ -76,6 +76,9 @@ class PluginSSHConfig:
 	@staticmethod
 	def __rescurive_load_from_system_ssh_config(paramiko_SSHClient_proxy_config, host, last_plugin_ssh_config=None):
 		config = paramiko_SSHClient_proxy_config.lookup(host)
+		if not config:
+			return None
+		
 		hostname = config.get("hostname")
 		username = config.get("user")
 		port = config.get("port", "22")

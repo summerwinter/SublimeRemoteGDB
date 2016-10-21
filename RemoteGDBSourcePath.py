@@ -6,7 +6,7 @@ class RemoteGDBSourcePath:
     def __init__(self):
         pass
 
-    def init(self, debug_mode="local", auto_substitute=False, prefix_postfix_list=None, remote_prefix_path=None, project_path=""):
+    def init(self, debug_mode="local", auto_substitute=False, prefix_postfix_list=None, project_path=""):
         self.debug_mode = debug_mode
         self.auto_substitute = auto_substitute
         if prefix_postfix_list is not None:
@@ -18,25 +18,34 @@ class RemoteGDBSourcePath:
                 self.dictionary = self.build_dictionary(project_path)
 
     def translate_local_path(self,local_path):
+        # print("11local path: %s" % local_path)
         if self.debug_mode == "local":
+            # print("local local path: %s" % local_path)
             return local_path
         elif self.auto_substitute == False:
             translated_path = str(local_path).replace(self.local_prefix_path, self.remote_prefix_path, 1)
             self.simplifyPath(translated_path)
+            # print("local translated path: %s" % translated_path)
+            # return translated_path.split("/")[-1]
             return translated_path
         else:
+            print("local local local path: haha")
             path_list = local_path.split("/")
             return path_list[-1]
 
 
     def translate_remote_path(self, remote_path):
+        # print("11remote path: %s" % remote_path)
         if self.debug_mode == "local":
+            # print("remote remote path: %s" % remote_path)
             return remote_path
         elif self.auto_substitute == False:
             translated_path = remote_path.replace(self.remote_prefix_path, self.local_prefix_path, 1)
             self.simplifyPath(translated_path)
+            # print("remote translate path: %s" % translated_path)
             return translated_path
         else:
+            # print("remote remote remote path: haha")
             path = remote_path.split("/")[-1]
             return self.dictionary.get(path, "")
 

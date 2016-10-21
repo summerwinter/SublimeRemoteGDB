@@ -21,6 +21,10 @@
         "context": [{"key": "gdb_running"}, {"key": "gdb_variables_view"}]
     },
     {
+        "command": "gdb_clean",
+        "keys": ["ctrl+shift+f5"]
+    },
+    {
         "command": "gdb_input",
         "keys": ["shift+f5"]
     },
