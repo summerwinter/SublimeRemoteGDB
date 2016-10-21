@@ -195,5 +195,24 @@
     "debug": true,
 
     // Disables showing the error message dialog when something goes wrong
-    "i_know_how_to_use_gdb_thank_you_very_much": false
+    "i_know_how_to_use_gdb_thank_you_very_much": false,
+    
+     "colors": [
+   {
+      "regex": "note",
+      "icon": "Packages/Highlight Build Errors/information.png"
+    },
+    {
+      "regex": "warning",
+      "scope": "invalid",
+      "display": "outline",
+      "icon": "Packages/Highlight Build Errors/warning.png"
+    },
+    {
+      // default color, when none of the above matches
+      "scope": "invalid",
+      "display": "fill",
+      "icon": "Packages/Highlight Build Errors/error.png"
+    }
+  ]
 }

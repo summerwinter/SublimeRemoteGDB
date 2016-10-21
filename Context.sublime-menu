@@ -52,6 +52,11 @@
         {
             "caption": "Add watch",
             "command": "gdb_add_watch"
+        },
+        {
+            "caption" : "Show Error Message",
+            "command" : "show_error_message"
         }
     ]
-}]
+}
+]

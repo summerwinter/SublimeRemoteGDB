@@ -60,6 +60,62 @@
                                     "platform": "Windows"
                                 },
                                 "caption": "Key Bindings – User"
+                            },
+                             {
+                                "caption": "Highlight Build Errors",
+                                "children":
+                                [                            
+                                    {
+                                        "command": "open_file",
+                                        "args": {
+                                            "file": "${packages}/SublimeRemoteGDB/SublimeRemoteGDB.sublime-settings"
+                                        },
+                                        "caption": "Settings - Default"
+                                    },
+                                    {
+                                        "command": "open_file",
+                                        "args": {
+                                            "file": "${packages}/User/SublimeRemoteGDB.sublime-settings"
+                                        },
+                                        "caption": "Settings - User"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "preferences",
+        "mnemonic": "n",
+        "id": "preferences",
+        "children":
+        [
+            {
+                "caption": "Package Settings",
+                "mnemonic": "P",
+                "id": "package-settings",
+                "children":
+                [
+                    {
+                        "caption": "Highlight Build Errors",
+                        "children":
+                        [                            
+                            {
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/Highlight Build Errors/HighlightBuildErrors.sublime-settings"
+                                },
+                                "caption": "Settings - Default"
+                            },
+                            {
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/User/HighlightBuildErrors.sublime-settings"
+                                },
+                                "caption": "Settings - User"
                             }
                         ]
                     }
