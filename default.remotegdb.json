@@ -1,0 +1,49 @@
+{
+	// you should copy this file to your project dir, and then configure related terms
+
+	// if no set, default is /usr/local/bin/gdb. In mac, you may need to add sudo
+	"gdb_path": "/usr/local/bin/gdb",
+	// local or remote
+	"local_remote_mode": "local",
+	// exec, attach or coredump
+	"debug_mode": "exec",
+	// if debug_mode is exec
+	"exec": {
+		// if workingdir is not specified, you should specify executable_file with absolute path
+		"workingdir": "/home/test",
+		"executable_file": "hello",
+		"arguments": ""
+	},
+	// if debug_mode is attach
+	"attach": {
+		// if attach_id is sepcified, I will attach it directly
+		"attach_id": "",
+		// if attach_id is not specified, I will search by attach_keywork, and if find multiple results, I will let you choose
+		"attach_keyword": ""
+	},
+	// if debug_mode is coredump
+	"coredump": {
+		// both should be absolute path
+		"executable_file": "",
+		"coredump_file": ""
+	},
+	// if local_remote_mode is remote
+	// if remote_host is specified, I will find it from /etc/ssh/ssh_config or ~/.ssh/config
+	"remote_host": "",
+	// if remote_host is not sepcified, you should specify the nested remote_ssh_config
+	// some terms may be empty or deleted, you should ensure that you can connect the remote host by the path you specified
+	"remote_ssh_config": [
+		{
+			"hostname": "",
+			"port": 22,
+			"username": "",
+			"password": "",
+			"identityfile": ""
+		}
+	],
+	// if local_remote_mode is remote, you should either specify substitute_path or set auto_substitute to 1
+	// substitute_path is used to transform between local source code paths and remote source code paths
+	"substitute_path": ["/local/codepath", "/remote/codepath"],
+	// if auto_substitute is set to 1, I will establish the index file, and auto transform souce code paths
+	"auto_substitute": 0
+}

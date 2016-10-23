@@ -17,8 +17,18 @@ class RemoteGDBSettings:
 
         try:
             with open(project_setting_file) as data_file:
-                self.data = json.load(data_file)
-        except Exception:
+                json_str = ""
+                for line in data_file.readlines():
+                    line = line.strip()
+                    if len(line) == 0:
+                        continue
+                    if line.startswith("//"):
+                        continue
+                    json_str += line
+                    json_str += "\n"
+                self.data = json.loads(json_str)
+        except Exception as err:
+            print(err)
             # sublime.error_message("some errors exist in project setting file!")
             return False
 

@@ -66,7 +66,6 @@ def get_project_dir():
     if not view:
         return None
     fn = view.file_name()
-    print(fn)
     if not fn:
         return None
     fn = normalize(fn)
@@ -91,11 +90,6 @@ gdb_process = GDBProcess()
 gdb_source_path = RemoteGDBSourcePath()
 gdb_project_dir = None
 
-class GdbSetViewContent(sublime_plugin.TextCommand):
-    def run(self, edit, text):
-        self.view.erase(edit, sublime.Region(0, self.view.size()))
-        self.view.insert(edit, 0, text)
-
 def generate_gdb_process():
     global gdb_project_dir
     gdb_project_dir = get_project_dir()
@@ -103,17 +97,21 @@ def generate_gdb_process():
         sublime.error_message("can't find the project dir, I don't know which folder you are in!")
         return False
     
-    print(gdb_project_dir)
     if gdb_settings.load_settings(gdb_project_dir) == False:
-        sublime.error_message("load project config file failed!")
         project_setting_file = RemoteGDBSettings.project_setting_file(gdb_project_dir)
-        if os.path.exists(project_setting_file):
-            sublime.active_window().open_file(project_setting_file, sublime.ENCODED_POSITION)
-        else:
-            # project_config_view = sublime.active_window().new_file(project_setting_file)
-            project_config_view = sublime.active_window().open_file(project_setting_file, sublime.ENCODED_POSITION)
-            data = open(os.path.join(sublime.packages_path(), "SublimeRemoteGDB/.remotegdb.json"), "r").read()
-            project_config_view.run_command("gdb_set_view_content", {"text": data})
+
+        sublime.error_message("You have not configured the project config correctly, the default configuration file and your project configuration file will open in a new window")
+        sublime.run_command("new_window")
+        wnd = sublime.active_window()
+        wnd.set_layout({
+            "cols": [0.0, 0.5, 1.0],
+            "rows": [0, 1.0],
+            "cells": [[0,0,1,1], [1,0,2,1]],
+        })
+        v = wnd.open_file(os.path.join(sublime.packages_path(), "SublimeRemoteGDB/default.remotegdb.json"))
+        v.set_read_only(True)
+        v2 = wnd.open_file(project_setting_file)
+        wnd.set_view_index(v2, 1, 0)
 
         return False
 
@@ -123,7 +121,6 @@ def generate_gdb_process():
         return False
 
     auto_substitute = gdb_settings.get("auto_substitute", False)
-    print(auto_substitute)
     substitute_path = gdb_settings.get("substitute_path")
     if local_remote_mode == "remote" and auto_substitute == False and (substitute_path is None or not isinstance(substitute_path, list) or len(substitute_path) != 2):
         sublime.error_message("please specify correct substitute path!")
@@ -131,10 +128,6 @@ def generate_gdb_process():
 
     global gdb_source_path
     gdb_source_path.init(local_remote_mode, auto_substitute, substitute_path, gdb_project_dir)
-
-    
-    print(substitute_path)
-
 
     gdb_path = gdb_settings.get("gdb_path", "/usr/local/bin/gdb")
 
@@ -182,13 +175,17 @@ def generate_gdb_process():
             sublime.error_message("please specify the executable_file in %s debug mode!" % debug_mode)
             return False
 
-        gdb_process.debug_by_executable_file(workingdir, executable_file)
+        arguments = gdb_settings.get("exec.arguments")
+        if arguments is not None and len(arguments) == 0:
+            arguments = None
+
+        gdb_process.debug_by_executable_file(workingdir, executable_file, arguments)
 
     elif debug_mode == "attach":
-        exec_and_symbol_file = gdb_settings.get("attach.exec_and_symbol_file")
-        if not exec_and_symbol_file or len(exec_and_symbol_file) == 0:
-            sublime.error_message("please specify the exec_and_symbol_file!")
-            return False
+        # exec_and_symbol_file = gdb_settings.get("attach.exec_and_symbol_file")
+        # if not exec_and_symbol_file or len(exec_and_symbol_file) == 0:
+        #     sublime.error_message("please specify the exec_and_symbol_file!")
+        #     return False
 
         attach_id = gdb_settings.get("attach.attach_id")
         attach_keyword = gdb_settings.get("attach.attach_keyword")
@@ -1109,7 +1106,6 @@ class GDBThreadsView(GDBView):
                             if "value" in arg:
                                 args += " = " + arg["value"]
                     func = "%s(%s);" % (func, args)
-                print("thread %s" % thread)
                 self.threads.append(GDBThread(int(thread["id"]), thread["state"], func, thread.get("details")))
 
         if "current-thread-id" in ids:
@@ -1717,17 +1713,31 @@ def cleanup():
 class GdbClean(sublime_plugin.WindowCommand):
     def run(self):
         def close_view(view):
-            gdb_bkp_window.focus_view(view)
-            gdb_bkp_window.run_command("close")
+            self.window.focus_view(view)
+            self.window.run_command("close")
 
-        for view in gdb_bkp_window.views():
-            if view.name().find("Callback") != -1 or \
+        for view in self.window.views():
+            if view.name().find("Callstack") != -1 or \
                 view.name().find("Console") != -1 or \
                 view.name().find("Session") != -1 or \
                 view.name().find("Variables") != -1 or \
                 view.name().find("Threads") != -1 or \
                 view.name().find("Breakpoints") != -1:
                 close_view(view)
+
+        same_group_id = -1
+        for view in self.window.views():
+            group_id = self.window.get_view_index(view)[0]
+            if same_group_id == -1:
+                same_group_id = group_id
+            elif group_id != same_group_id:
+                return
+
+        self.window.set_layout({
+            "cols": [0.0, 1.0],
+            "rows": [0.0, 1.0],
+            "cells": [[0,0,1,1]]
+        })
 
     def is_enabled(self):
         return not is_running()
@@ -1832,6 +1842,10 @@ class GdbNextCmd(sublime_plugin.TextCommand):
         else:
             set_input(edit, "")
 
+class GdbSetInputCmd(sublime_plugin.TextCommand):
+    def run(self, edit, text):
+        set_input(edit, text)
+
 
 def show_input(focus=False):
     global gdb_input_view
@@ -1841,15 +1855,22 @@ def show_input(focus=False):
     if focus == True:
         sublime.active_window().focus_view(gdb_input_view)
 
-
-
 def input_on_done(s):
     global gdb_global_command_input_focused
     if s.strip() != "quit":
-        show_input()
-        gdb_command_history.append(s)
         gdb_global_command_input_focused = True
-
+        if s == "":
+            if len(gdb_command_history) > 0:
+                s = gdb_command_history[len(gdb_command_history) - 1]
+                show_input()
+            else:
+                show_input()
+                return
+        else:
+            if len(gdb_command_history) == 0  or (len(gdb_command_history) > 0 and gdb_command_history[len(gdb_command_history) - 1] != s):
+                gdb_command_history.append(s)
+            
+            show_input()
     run_cmd(s)
 
 
@@ -1878,16 +1899,12 @@ class GdbLaunch(sublime_plugin.WindowCommand):
             return
 
         generate_gdb_process()
-        # return
-        
-        print(gdb_process._commandline)
         
         if gdb_process.valid():
             gdb_process.start()
             gdb_process.pipe()
             self.launch()
         else:
-            print("not valid!")
             gdb_process = GDBProcess()
 
         # global exec_settings
@@ -1928,8 +1945,8 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         gdb_first_callstack = False
         view = self.window.active_view()
         # DEBUG = get_setting("debug", False, view)
-        DEBUG = True
-        DEBUG_FILE = "stdout"
+        # DEBUG = True
+        # DEBUG_FILE = "stdout"
         # DEBUG_FILE = expand_path(get_setting("debug_file", "stdout", view), self.window)
         # if DEBUG:
         #     print("Will write debug info to file: %s" % DEBUG_FILE)
@@ -2060,8 +2077,8 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         else:
             if(get_setting("run_after_init", True)):
                 gdb_run_status = "running"
-                # if arguments:
-                #     run_cmd("-exec-arguments " + arguments)
+                if gdb_process._arguments:
+                    run_cmd("-exec-arguments " + gdb_process._arguments)
 
                 run_cmd(get_setting("exec_cmd", "-exec-run"), True)
             else:
@@ -2105,6 +2122,9 @@ class GdbExit(sublime_plugin.WindowCommand):
         run_cmd("-gdb-exit", True)
         # if gdb_server_process:
         #     gdb_server_process.terminate()
+
+        sublime.active_window().run_command("hide_panel", {"cancel": True})
+
 
     def is_enabled(self):
         return is_running()

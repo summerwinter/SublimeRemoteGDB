@@ -27,7 +27,7 @@ class GDBProcess:
 		self._gdb_command = "gdb --interpreter=mi"
 		self._commandline = None
 
-	def debug_by_executable_file(self, workingdir, executable_file):
+	def debug_by_executable_file(self, workingdir, executable_file, arguments=None):
 		if workingdir:
 			workingdir = os.path.expanduser(workingdir)
 			self._workingdir = workingdir
@@ -37,6 +37,8 @@ class GDBProcess:
 				self._commandline = "%s %s" % (self._gdb_command, os.path.join(os.path.expanduser(workingdir), executable_file))
 		else:
 			self._commandline = "%s %s" % (self._gdb_command, executable_file)
+
+		self._arguments = arguments
 
 	def debug_by_attach(self, pid):
 		self._commandline = "%s attach %d" % (self._gdb_command, pid)

@@ -1,109 +1,4 @@
 {
-    // All options in here can also be specified in your project settings
-    // with a prepended "sublimegdb_". You probably want to
-    // have something like this in your project settings:
-    //
-    // "settings":
-    // {
-    //      "sublimegdb_workingdir": "${folder:${project_path:your_executable_name}}",
-    //      // NOTE: You MUST provide --interpreter=mi for the plugin to work
-    //      "sublimegdb_commandline": "gdb --interpreter=mi ./your_executable_name"
-    //
-    // }
-    // 
-    // generalized pattern for using always the current open file with an executable name 
-    // as the current file
-    // "settings":
-    // {
-    //      "sublimegdb_workingdir": "${folder:${file}}",
-    //      // put your arguments hear
-    //      "sublimegdb_arguments": "",
-    //      // NOTE: You MUST provide --interpreter=mi for the plugin to work
-    //      "sublimegdb_commandline": "gdb --interpreter=mi --args ./${file_base_name}"
-    //      
-    //
-    // }
-    //
-    // If you want to debug different executables as part of the same project, you can add something
-    // like this to your project settings:
-    //
-    // "settings":
-    // {
-    //      "sublimegdb_executables":
-    //      {
-    //          "first_executable_name":
-    //          {
-    //              "workingdir": "${folder:${project_path:first_executable_name}}",
-    //              "commandline": "gdb --interpreter=mi ./first_executable"
-    //          },
-    //          "second_executable_name":
-    //          {
-    //              "workingdir": "${folder:${project_path:second_executable_name}}",
-    //              "commandline": "gdb --interpreter=mi ./second_executable"
-    //          }
-    //      }
-    // }
-    //
-    // When you start debugging, you will be prompted to choose from one of your executables. Any
-    // settings not specified for that project will be searched in your project settings (with a
-    // sublimegdb_ prefix), then in your user settings, then in the default settings.
-    //
-    // (Note: if you have multiple executables, and you have a breakpoint set in a source file which
-    // is not included in the current executable, you may have to set either debug_ext or
-    // i_know_how_to_use_gdb_thank_you_very_much.)
-    //
-    // ${home}, ${project_path:}, ${folder:}, ${file} and ${file_base_name}
-    // tokens can be used in 'workingdir', 'commandline', 'arguments' options.
-    //
-    // ${home} is replaced with the value of the HOME environment variable.
-    //
-    // ${project_path:} tries to find a file with the given name in all the registered project folders and
-    // returns the first file found, or the original file name if none is found.
-    // Example: ${project_path:main.cpp} tries to find a file named "main.cpp" relative
-    // to the current project's folders. If none is found, it is replaced with "main.cpp".
-    //
-    // ${folder:} is replaced with the dirname of the given path.
-    // Example: ${folder:/path/to/file} is replaced with "/path/to".
-    // "workingdir": "/tmp",
-    //
-    // ${file} is replaced with absolute path to currently open file (if any)
-    // Example: /home/user/main.cpp
-    //
-    // ${file_base_name} is replaced with name without extension of currently
-    // open file (if any)
-    // Example: replaced with "main" for file "/home/user/main.cpp"
-    "workingdir": "notset",
-
-    // NOTE: You MUST provide --interpreter=mi for the plugin to work
-    // "commandline": "gdb --interpreter=mi ./executable",
-    "commandline": "notset",
-
-    // Environments for running gdb and gdb server
-    // Example: "env": {"DISPLAY": ":100"}
-    "env": "notset",
-
-    // Arguments for the program.
-    // Example: to run "./executable foo bar"
-    // "arguments": "foo bar"
-    // To provide user input (stdin) use
-    // "arguments": "< input.dat"
-    "arguments": "",
-
-    // GDB Server 
-    // Specify a command and working dir for launching a GDB Server
-    // This is useful for dealing with "remote" servers that are actually locally 
-    // connected JTAG boxes
-    "server_workingdir": "notset",
-    "server_commandline": "notset",
-
-    // The command to use to run the program.
-    // If you are attaching to a remote program, you
-    // probably want to change this to -exec-continue
-    "exec_cmd": "-exec-run",
-
-    // Load the image to the remote target
-    "load_cmd": "-target-download",
-
     // Immediately run the target upload connecting
     // When attaching to a remote program, you
     // may want to set this to false 
@@ -149,7 +44,7 @@
     "file_group": 0,
 
     "session_group": 1,
-    "session_open": true,
+    "session_open": false,
 
     "console_group": 1,
     "console_open": true,
@@ -170,7 +65,7 @@
     "disassembly_flavor": "intel",
 
     "threads_group": 3,
-    "threads_open": false,
+    "threads_open": true,
 
     "breakpoints_group": 3,
     "breakpoints_open": true,
