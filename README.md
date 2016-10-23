@@ -20,7 +20,7 @@ This plugin is based on [SublimeGDB](https://github.com/quarnster/SublimeGDB), s
 
 In this plugin, every folder in Sublime Text is considered as a project. When you are in a file which is in one folder opened in Sublime Text, press <kbd>F5</kbd> to start debugging, this plugin will promot you to config as follows.
 
-```json
+```
 {
   // you should copy this file to your project dir, and then configure related terms
 
@@ -87,6 +87,7 @@ Each time if you want to debug one project, drag it into Sublime Text as one fol
 * Chaochao Liang
 * Lei Wu
 * Xiadong Wang
+
 (This plugin is produced by hackathon, so it isn't perfect! Let us imporve it together and make Sublime Text a C/C++ IDE like Visual Studio!)
 
 ## Thanks
