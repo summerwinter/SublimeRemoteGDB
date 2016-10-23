@@ -170,7 +170,7 @@
     "disassembly_flavor": "intel",
 
     "threads_group": 3,
-    "threads_open": true,
+    "threads_open": false,
 
     "breakpoints_group": 3,
     "breakpoints_open": true,

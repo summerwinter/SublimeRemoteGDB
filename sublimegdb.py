@@ -89,6 +89,7 @@ from SublimeRemoteGDB.RemoteGDBSourcePath import RemoteGDBSourcePath
 gdb_settings = RemoteGDBSettings()
 gdb_process = GDBProcess()
 gdb_source_path = RemoteGDBSourcePath()
+gdb_project_dir = None
 
 class GdbSetViewContent(sublime_plugin.TextCommand):
     def run(self, edit, text):
@@ -96,16 +97,16 @@ class GdbSetViewContent(sublime_plugin.TextCommand):
         self.view.insert(edit, 0, text)
 
 def generate_gdb_process():
-    project_dir = get_project_dir()
-    # print(project_dir)
-    if not project_dir:
+    global gdb_project_dir
+    gdb_project_dir = get_project_dir()
+    if not gdb_project_dir:
         sublime.error_message("can't find the project dir, I don't know which folder you are in!")
         return False
     
-    print(project_dir)
-    if gdb_settings.load_settings(project_dir) == False:
+    print(gdb_project_dir)
+    if gdb_settings.load_settings(gdb_project_dir) == False:
         sublime.error_message("load project config file failed!")
-        project_setting_file = RemoteGDBSettings.project_setting_file(project_dir)
+        project_setting_file = RemoteGDBSettings.project_setting_file(gdb_project_dir)
         if os.path.exists(project_setting_file):
             sublime.active_window().open_file(project_setting_file, sublime.ENCODED_POSITION)
         else:
@@ -129,7 +130,7 @@ def generate_gdb_process():
         return False
 
     global gdb_source_path
-    gdb_source_path.init(local_remote_mode, auto_substitute, substitute_path, project_dir)
+    gdb_source_path.init(local_remote_mode, auto_substitute, substitute_path, gdb_project_dir)
 
     
     print(substitute_path)
@@ -333,6 +334,7 @@ gdb_stack_index = 0
 gdb_global_lock = threading.Lock()
 gdb_global_clean_count = 0
 gdb_global_command_input_focused = False
+gdb_first_callstack = False
 
 gdb_nonstop = False
 
@@ -1227,6 +1229,7 @@ class GDBBreakpoint(object):
 
     @property
     def filename(self):
+        return normalize(self.original_filename)
         if self.number != -1:
             return normalize(self.resolved_filename)
         return normalize(self.original_filename)
@@ -1281,14 +1284,14 @@ class GDBBreakpoint(object):
             self.breakpoint_added(res)
 
     def add(self):
-        if is_running():
+        if is_running() and self.is_valid():
             res = wait_until_stopped()
             self.insert()
             if res:
                 resume()
 
     def remove(self):
-        if is_running():
+        if is_running() and self.is_valid():
             res = wait_until_stopped()
             run_cmd("-break-delete %s" % self.number)
             if res:
@@ -1296,6 +1299,9 @@ class GDBBreakpoint(object):
 
     def format(self):
         return "%d - %s:%d\n" % (self.number, self.filename, self.line)
+
+    def is_valid(self):
+        return self.original_filename.startswith(gdb_project_dir + os.sep)
 
 
 class GDBWatch(GDBBreakpoint):
@@ -1405,7 +1411,8 @@ class GDBBreakpointView(GDBView):
         self.clear()
         self.breakpoints.sort(key=lambda b: (b.number, b.filename, b.line))
         for bkpt in self.breakpoints:
-            self.add_line(bkpt.format())
+            if bkpt.is_valid():
+                self.add_line(bkpt.format())
         self.set_viewport_position(pos)
         self.update()
 
@@ -1473,7 +1480,6 @@ def run_cmd(cmd, block=False, mimode=True, timeout=10):
         cmd = "%d%s\n" % (count, cmd)
     else:
         cmd = "%s\n\n" % cmd
-    # print(cmd)
     log_debug(cmd)
     if gdb_session_view is not None:
         gdb_session_view.add_line(cmd, False)
@@ -1493,13 +1499,6 @@ def run_cmd(cmd, block=False, mimode=True, timeout=10):
 
 def wait_until_stopped():
     if gdb_run_status == "running":
-        # result = run_cmd("-exec-interrupt --all", True)
-        if gdb_settings.get("debug_mode") == "attach":
-            cmd = "-target-detach %d" % gdb_process._pid
-        elif gdb_settings.get("debug_mode") == "coredump":
-            return
-        else:
-            cmd = "-exec-interrupt --all"
         result = run_cmd("-exec-interrupt --all", True)
         
         if "^done" in result:
@@ -1579,6 +1578,11 @@ def update_cursor():
     gdb_variables_view.update_variables(sameFrame)
     gdb_register_view.update_values()
     gdb_disassembly_view.update_disassembly()
+
+    global gdb_first_callstack
+    if gdb_first_callstack == False and gdb_settings.get("debug_mode") in ["attach", "coredump"]:
+        gdb_first_callstack = True
+        gdb_breakpoint_view.sync_breakpoints()
 
 
 def session_ended_status_message():
@@ -1667,7 +1671,6 @@ def cleanup():
         else:
             gdb_global_clean_count = 1
 
-            print(gdb_bkp_window.num_groups())
             currentLayout = gdb_bkp_window.get_layout()
             s = sublime.load_settings("SublimeRemoteGDB.sublime-settings")
             s.set("layout",currentLayout)
@@ -1918,11 +1921,15 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         global gdb_shutting_down
         global DEBUG
         global DEBUG_FILE
+        global count
+        global gdb_first_callstack
 
+        count = 0
+        gdb_first_callstack = False
         view = self.window.active_view()
         # DEBUG = get_setting("debug", False, view)
-        # DEBUG = True
-        # DEBUG_FILE = "stdout"
+        DEBUG = True
+        DEBUG_FILE = "stdout"
         # DEBUG_FILE = expand_path(get_setting("debug_file", "stdout", view), self.window)
         # if DEBUG:
         #     print("Will write debug info to file: %s" % DEBUG_FILE)
@@ -2044,15 +2051,11 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         # attach_cmd = get_setting("attach_cmd","notset")
         # if(attach_cmd != "notset"):
         #     run_cmd(attach_cmd)
-        if gdb_settings.get("debug_mode") == "attach":
-            run_cmd("-target-attach %d" % gdb_process._pid)
-            run_cmd("-file-exec-and-symbols %s" % gdb_settings.get("attach.exec_and_symbol_file"))
+        
+        if gdb_settings.get("debug_mode") == "exec":
+            gdb_breakpoint_view.sync_breakpoints()
 
-        gdb_breakpoint_view.sync_breakpoints()
-
-        if gdb_settings.get("debug_mode") == "attach":
-            gdb_run_status = "running"
-        elif gdb_settings.get("debug_mode") == "coredump":
+        if gdb_settings.get("debug_mode") in ["attach", "coredump"]:
             gdb_run_status = "stopped"
         else:
             if(get_setting("run_after_init", True)):
@@ -2066,7 +2069,6 @@ class GdbLaunch(sublime_plugin.WindowCommand):
 
 
         if gdb_settings.get("debug_mode") == "coredump":
-            run_cmd("core %s" % gdb_settings.get("coredump.coredump_file"))
             update_cursor()
 
 

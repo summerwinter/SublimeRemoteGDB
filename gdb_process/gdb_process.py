@@ -39,11 +39,11 @@ class GDBProcess:
 			self._commandline = "%s %s" % (self._gdb_command, executable_file)
 
 	def debug_by_attach(self, pid):
-		self._commandline = "%s" % (self._gdb_command)
+		self._commandline = "%s attach %d" % (self._gdb_command, pid)
 		self._pid = pid
 
 	def debug_by_coredump(self, executable_file_path, coredump_file_path):
-		self._commandline = "%s %s" % (self._gdb_command, executable_file_path) #, coredump_file_path)
+		self._commandline = "%s %s %s" % (self._gdb_command, executable_file_path, coredump_file_path)
 
 	def valid(self):
 		return self._commandline is not None
