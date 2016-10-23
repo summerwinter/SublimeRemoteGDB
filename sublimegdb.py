@@ -2214,13 +2214,16 @@ class GdbToggleBreakpoint(sublime_plugin.TextCommand):
                 gdb_breakpoint_view.toggle_breakpoint(fn, line + 1)
         update_view_markers(self.view)
 
+from SublimeRemoteGDB.HighlightBuildErrors import *
 
 class GdbClick(sublime_plugin.TextCommand):
     def run(self, edit):
-        if not is_running():
+        if not is_running() and not g_error_views.is_open():
             return
 
         row, col = self.view.rowcol(self.view.sel()[0].a)
+        if g_error_views.is_open() and self.view.id() == g_error_views.get_view().id():
+            g_error_views.select(row)
         if gdb_variables_view.is_open() and self.view.id() == gdb_variables_view.get_view().id():
             gdb_variables_view.expand_collapse_variable(self.view, toggle=True)
         elif gdb_callstack_view.is_open() and self.view.id() == gdb_callstack_view.get_view().id():
@@ -2230,7 +2233,7 @@ class GdbClick(sublime_plugin.TextCommand):
             update_cursor()
 
     def is_enabled(self):
-        return is_running()
+        return is_running() or g_error_views.is_open()
 
 
 class GdbDoubleClick(sublime_plugin.TextCommand):

@@ -120,6 +120,8 @@ class BuildErrorsViews:
         return self.view
 
     def select(self, row):
+        if row >= len(self.error_lines):
+            return
         errorline = self.error_lines[row]
         sublime.active_window().open_file("%s:%d" % (errorline.file_name, errorline.line), sublime.ENCODED_POSITION)
 
@@ -226,6 +228,7 @@ class ErrorParser:
 def doHighlighting(self):
     output = self.output_view.substr(sublime.Region(0, self.output_view.size()))
     error_pattern = self.output_view.settings().get("result_file_regex")
+    print(error_pattern)
     error_parser = ErrorParser(error_pattern)
 
     global g_errors
@@ -268,15 +271,15 @@ class ShowBuildErrorsCommand(sublime_plugin.WindowCommand):
         g_show_errors = True
         update_all_views(self.window)
 
-class ErrorsClick(sublime_plugin.TextCommand):
-    def run(self, edit):
-        if not g_error_views.is_open():
-            return
-        row, col = self.view.rowcol(self.view.sel()[0].a)
-        if g_error_views.is_open() and self.view.id() == g_error_views.get_view().id():
-            g_error_views.select(row)
-    def is_enabled(self):
-        return g_error_views.is_open()
+# class ErrorsClick(sublime_plugin.TextCommand):
+#     def run(self, edit):
+#         if not g_error_views.is_open():
+#             return
+#         row, col = self.view.rowcol(self.view.sel()[0].a)
+#         if g_error_views.is_open() and self.view.id() == g_error_views.get_view().id():
+#             g_error_views.select(row)
+#     def is_enabled(self):
+#         return g_error_views.is_open()
 
 class ErrorViewClear(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -294,5 +297,5 @@ class ErrorViewAddLine(sublime_plugin.TextCommand):
 
 class ErrorViewEventListener(sublime_plugin.EventListener):
      def on_close(self, view):
-        if view.id() == g_error_views.get_view().id():
+        if g_error_views.get_view() and view.id() == g_error_views.get_view().id():
             g_error_views.destroy_view()
