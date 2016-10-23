@@ -77,7 +77,7 @@ This plugin replaces the simple configuration in SublimeGDB with more complex bu
 
 ## Usage
 
-Each time if you want to debug one project, drag it into Sublime Text as one folder. Open any file in that folder, then start debugging. You should ensure the local source code is consistent the remote source code.
+Each time if you want to debug one project, drag it into Sublime Text as one folder. Open any file in that folder, then start debugging. You should ensure the local source code is consistent with the remote source code.
 
 ## Contributors
 
