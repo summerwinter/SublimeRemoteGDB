@@ -31,12 +31,10 @@ class GDBProcess:
 		if workingdir:
 			workingdir = os.path.expanduser(workingdir)
 			self._workingdir = workingdir
-			if self._remote == False:
-				self._commandline = "%s %s" % (self._gdb_command, executable_file)
-			else:
-				self._commandline = "%s %s" % (self._gdb_command, os.path.join(os.path.expanduser(workingdir), executable_file))
 		else:
-			self._commandline = "%s %s" % (self._gdb_command, executable_file)
+			self._workingdir = None
+			
+		self._commandline = "%s %s" % (self._gdb_command, executable_file)
 
 		self._arguments = arguments
 

@@ -43,7 +43,11 @@ class RemoteProcess(local_process.SelfDefinedProcess):
 		if not self._nested_paramiko:
 			raise Exception("nested paramiko not start!")
 
-		self._stdin, self._stdout, self._stderr = self._nested_paramiko._client.exec_command(commandline
+		if workingdir is not None:
+			self._stdin, self._stdout, self._stderr = self._nested_paramiko._client.exec_command("cd %s; %s" % (workingdir, commandline
+			))
+		else:
+			self._stdin, self._stdout, self._stderr = self._nested_paramiko._client.exec_command(commandline
 			)
 
 	def stop(self):

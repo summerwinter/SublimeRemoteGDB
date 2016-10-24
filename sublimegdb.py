@@ -1945,10 +1945,8 @@ class GdbLaunch(sublime_plugin.WindowCommand):
         count = 0
         gdb_first_callstack = False
         view = self.window.active_view()
-        # DEBUG = get_setting("debug", False, view)
-        # DEBUG = True
-        # DEBUG_FILE = "stdout"
-        # DEBUG_FILE = expand_path(get_setting("debug_file", "stdout", view), self.window)
+        DEBUG = get_setting("debug", False, view)
+        DEBUG_FILE = expand_path(get_setting("debug_file", "stdout", view), self.window)
         # if DEBUG:
         #     print("Will write debug info to file: %s" % DEBUG_FILE)
         # if gdb_process is None or gdb_process.poll() is not None:
