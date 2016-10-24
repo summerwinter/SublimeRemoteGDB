@@ -1518,7 +1518,8 @@ def resume():
 def get_result(line):
     res = result_regex.search(line).group(0)
     if res == "error" and not get_setting("i_know_how_to_use_gdb_thank_you_very_much", False):
-        sublime.error_message("%s\n\n%s" % (line, "\n".join(traceback.format_stack())))
+        # sublime.error_message("%s\n\n%s" % (line, "\n".join(traceback.format_stack())))
+        sublime.error_message("%s" % line)
     return res
 
 
