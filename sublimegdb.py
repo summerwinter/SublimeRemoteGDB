@@ -1152,7 +1152,7 @@ class GDBDisassemblyView(GDBView):
 
     def open(self):
         super(GDBDisassemblyView, self).open()
-        self.set_syntax("Packages/SublimeGDB/gdb_disasm.tmLanguage")
+        self.set_syntax("Packages/SublimeRemoteGDB/gdb_disasm.tmLanguage")
         self.get_view().settings().set("word_wrap", False)
         if self.is_open() and gdb_run_status == "stopped":
             self.update_disassembly()
