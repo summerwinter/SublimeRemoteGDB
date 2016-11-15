@@ -2248,6 +2248,9 @@ class GdbClick(sublime_plugin.TextCommand):
         if not is_running() and not g_error_views.is_open():
             return
 
+        if gdb_run_status == "running":
+            return
+
         row, col = self.view.rowcol(self.view.sel()[0].a)
         if g_error_views.is_open() and self.view.id() == g_error_views.get_view().id():
             g_error_views.select(row)
@@ -2260,7 +2263,7 @@ class GdbClick(sublime_plugin.TextCommand):
             update_cursor()
 
     def is_enabled(self):
-        return is_running() or g_error_views.is_open()
+        return (is_running() or g_error_views.is_open()) and not gdb_run_status == "running"
 
 
 class GdbDoubleClick(sublime_plugin.TextCommand):
