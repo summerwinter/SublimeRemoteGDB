@@ -332,6 +332,7 @@ gdb_global_lock = threading.Lock()
 gdb_global_clean_count = 0
 gdb_global_command_input_focused = False
 gdb_first_callstack = False
+gdb_temp_interrupt = False
 
 gdb_nonstop = False
 
@@ -1495,24 +1496,29 @@ def run_cmd(cmd, block=False, mimode=True, timeout=10):
 
 def wait_until_stopped():
     if gdb_run_status == "running":
-        result = run_cmd("-exec-interrupt --all", True)
-        
-        if "^done" in result:
-            i = 0
-            while not "stopped" in gdb_run_status and i < 100:
-                i = i + 1
-                time.sleep(0.1)
-            if i >= 100:
-                print("I'm confused... I think status is %s, but it seems it wasn't..." % gdb_run_status)
-                return False
-            return True
+        # result = run_cmd("-exec-interrupt --all", True)
+        global gdb_temp_interrupt
+        gdb_temp_interrupt = True
+        gdb_process.interrupt()
+        # if "^done" in result:
+        i = 0
+        while not "stopped" in gdb_run_status and i < 100:
+            i = i + 1
+            time.sleep(0.1)
+        if i >= 100:
+            print("I'm confused... I think status is %s, but it seems it wasn't..." % gdb_run_status)
+            gdb_temp_interrupt = False
+            return False
+        gdb_temp_interrupt = False
+        return True
     return False
 
 
 def resume():
     global gdb_run_status
-    gdb_run_status = "running"
-    run_cmd("-exec-continue", True)
+    if gdb_run_status == "stopped":
+        gdb_run_status = "running"
+        run_cmd("-exec-continue", True)
 
 
 def get_result(line):
@@ -1619,7 +1625,7 @@ def gdboutput(pipe):
                 if reason is not None and reason.group(0).startswith("exited"):
                     log_debug("gdb: exiting %s" % line)
                     run_cmd("-gdb-exit")
-                elif not "running" in gdb_run_status and not gdb_shutting_down:
+                elif not "running" in gdb_run_status and not gdb_shutting_down and not gdb_temp_interrupt:
                     thread_id = re.search('thread-id="(\d+)"', line)
                     if thread_id is not None:
                         gdb_threads_view.select_thread(int(thread_id.group(1)))

@@ -14,6 +14,8 @@ class GDBProcess:
 		self._commandline = None
 		self._running = False
 		self._debug_ready = False
+		self._pid = None
+		self._pid_keyword = None
 
 	def set_local_debug(self, gdb_path="/usr/local/bin/gdb"):
 		self._remote = False
@@ -31,8 +33,10 @@ class GDBProcess:
 		if workingdir:
 			workingdir = os.path.expanduser(workingdir)
 			self._workingdir = workingdir
+			self._pid_keyword = os.path.join(workingdir, executable_file)
 		else:
 			self._workingdir = None
+			self._pid_keyword = executable_file
 			
 		self._commandline = "%s %s" % (self._gdb_command, executable_file)
 
@@ -103,3 +107,17 @@ class GDBProcess:
 			pids.append(line.decode(sys.getdefaultencoding()))
 
 		return pids
+
+	def interrupt(self):
+		if self._pid is None:
+			if self._pid_keyword is None:
+				return
+
+			pids = self.find_pids(self._pid_keyword)
+			if len(pids) == 1:
+				self._pid = int(pids[0])
+			else:
+				return
+
+		self.exec_command("kill -2 %d" % self._pid)
+		
