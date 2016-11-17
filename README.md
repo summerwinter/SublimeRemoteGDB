@@ -82,11 +82,11 @@ Each time if you want to debug one project, drag it into Sublime Text as one fol
 ## Contributors
 
 * Xiaomei Liu
-* Danshuang Wu
+* Danshuang Li
 * Dan Wu
 * Chaochao Liang
-* Lei Wu
-* Xiadong Wang
+* Lei Wang
+* summerwinterwang
 
 (This plugin is produced by hackathon, so it isn't perfect! Let us imporve it together and make Sublime Text a C/C++ IDE like Visual Studio!)
 
