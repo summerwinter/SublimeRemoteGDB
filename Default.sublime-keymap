@@ -95,5 +95,9 @@
         "command": "gdb_next_cmd",
         "context": [{"key": "gdb_input_view"}],
         "keys": ["down"]
+    },
+    {
+        "command": "gdb_breakpoint_info_copy_cmd",
+        "keys": ["ctrl+b"]
     }
 ]
