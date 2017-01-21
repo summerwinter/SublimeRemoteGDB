@@ -1858,7 +1858,7 @@ class GdbBreakpointInfoCopyCmd(sublime_plugin.TextCommand):
         filename = os.path.basename(view.file_name())
         (row,col) = self.view.rowcol(self.view.sel()[0].begin())
         bp_info = "%s:%d" % (filename, row + 1)
-        os.system("echo '%s' | pbcopy" % bp_info)
+        sublime.set_clipboard(bp_info)
 
 class GdbSetInputCmd(sublime_plugin.TextCommand):
     def run(self, edit, text):
