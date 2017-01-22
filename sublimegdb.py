@@ -1859,6 +1859,7 @@ class GdbBreakpointInfoCopyCmd(sublime_plugin.TextCommand):
         (row, col) = view.rowcol(view.sel()[0].begin())
         bp_info = "%s:%d" % (filename, row + 1)
         sublime.set_clipboard(bp_info)
+        sublime.status_message(bp_info + " copied")
 
 class GdbShowSymbolParentsCmd(sublime_plugin.TextCommand):
     def run(self, edit):
