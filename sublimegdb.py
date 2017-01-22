@@ -1856,9 +1856,63 @@ class GdbBreakpointInfoCopyCmd(sublime_plugin.TextCommand):
             return
 
         filename = os.path.basename(view.file_name())
-        (row,col) = self.view.rowcol(self.view.sel()[0].begin())
+        (row, col) = view.rowcol(view.sel()[0].begin())
         bp_info = "%s:%d" % (filename, row + 1)
         sublime.set_clipboard(bp_info)
+
+class GdbShowSymbolParentsCmd(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = sublime.active_window().active_view()
+        if not view:
+            return
+
+        symbols = view.symbols()
+        x_arr = [reg.begin() for reg, string in symbols]
+        import bisect
+        # find nearest symbol
+        pos = bisect.bisect_left(x_arr, view.sel()[0].begin())
+        if pos == 0:
+            return
+
+        current_symbol_idx = pos - 1
+        tab_size = view.settings().get("tab_size", 4)
+        translate_tabs_to_spaces = view.settings().get("translate_tabs_to_spaces", False)
+        def get_indent_size(symbol_idx):
+            line = view.substr(view.line(symbols[symbol_idx][0].begin()))
+            indent_size = 0
+            tab_num = 0
+            space_num = 0
+            for i in range(0, len(line)):
+                if line[i] == "\t":
+                    tab_num += 1
+                elif line[i] == " ":
+                    space_num += 1
+                else:
+                    break
+
+            if translate_tabs_to_spaces == True:
+                indent_size = space_num / tab_size
+            else:
+                # maybe spaces also exist
+                indent_size = tab_num + (space_num / tab_size)
+
+            return indent_size
+
+        indent_size = get_indent_size(current_symbol_idx)
+        results = []
+        # recursive get symbol parents
+        def find_parent_symbol(indent_size, symbol_idx):
+            if symbol_idx < 0 or indent_size < 0:
+                return
+            for idx in range(symbol_idx, -1, -1):
+                if get_indent_size(idx) == indent_size:
+                    results.append(symbols[idx][1])
+                    find_parent_symbol(indent_size - 1, idx - 1)
+                    return
+
+        find_parent_symbol(indent_size, current_symbol_idx)
+        
+        sublime.status_message("==>".join(results))
 
 class GdbSetInputCmd(sublime_plugin.TextCommand):
     def run(self, edit, text):

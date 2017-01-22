@@ -99,5 +99,9 @@
     {
         "command": "gdb_breakpoint_info_copy_cmd",
         "keys": ["ctrl+b"]
+    },
+    {
+        "command": "gdb_show_symbol_parents_cmd",
+        "keys": ["alt+p"]
     }
 ]
