@@ -1849,6 +1849,20 @@ class GdbNextCmd(sublime_plugin.TextCommand):
         else:
             set_input(edit, "")
 
+class GdbRunToLineCmd(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if gdb_run_status != "stopped":
+            return
+
+        view = sublime.active_window().active_view()
+        if not view:
+            return
+
+        filename = os.path.basename(view.file_name())
+        (row, col) = view.rowcol(view.sel()[0].begin())
+        cmd = "advance %s:%d" % (filename, row + 1)
+        run_cmd(cmd)
+
 class GdbBreakpointInfoCopyCmd(sublime_plugin.TextCommand):
     def run(self, edit):
         view = sublime.active_window().active_view()

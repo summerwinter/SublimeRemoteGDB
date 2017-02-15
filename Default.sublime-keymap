@@ -97,6 +97,10 @@
         "keys": ["down"]
     },
     {
+        "command": "gdb_run_to_line_cmd",
+        "keys": ["ctrl+r"]
+    },
+    {
         "command": "gdb_breakpoint_info_copy_cmd",
         "keys": ["ctrl+b"]
     },
