@@ -1240,6 +1240,15 @@ class GDBBreakpoint(object):
         if "bkpt" not in res:
             return
         bp = res["bkpt"]
+        # process multiple breakpoints template scenario
+        if isinstance(bp, list):
+            merged_map = {}
+            for per_bp in bp:
+                for key, val in per_bp.items():
+                    if key not in merged_map:
+                        merged_map[key] = val
+            bp = merged_map
+        
         if "fullname" in bp:
             self.resolved_filename = bp["fullname"]
         elif "file" in bp:
