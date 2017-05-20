@@ -1395,10 +1395,16 @@ class GDBBreakpointView(GDBView):
         self.update_view()
 
     def sync_breakpoints(self):
-        global breakpoints
         for bkpt in self.breakpoints:
             bkpt.add()
         update_view_markers()
+        self.update_view()
+
+    def clear_breakpoints(self):
+        for bkpt in self.breakpoints:
+            bkpt.remove()
+
+        self.breakpoints.clear()
         self.update_view()
 
     def update_view(self):
@@ -2110,7 +2116,7 @@ class GdbLaunch(sublime_plugin.WindowCommand):
                 view.open()
             view.clear()
 
-        
+        sublime.active_window().focus_view(gdb_callstack_view.view)
 
         gdb_shutting_down = False
 
@@ -2294,6 +2300,10 @@ class GdbAddWatch(sublime_plugin.TextCommand):
             exp = self.view.substr(self.view.word(self.view.sel()[0].begin()))
             gdb_breakpoint_view.toggle_watch(exp)
 
+class GdbClearBreakpoints(sublime_plugin.TextCommand):
+    def run(self, edit):
+        gdb_breakpoint_view.clear_breakpoints()
+        update_view_markers(self.view)
 
 class GdbToggleBreakpoint(sublime_plugin.TextCommand):
     def run(self, edit):

@@ -226,6 +226,7 @@ class ErrorParser:
             return [ErrorLine(m) for m in self.regex.finditer(text)]
 
 def doHighlighting(self):
+    return
     output = self.output_view.substr(sublime.Region(0, self.output_view.size()))
     error_pattern = self.output_view.settings().get("result_file_regex")
     print(error_pattern)

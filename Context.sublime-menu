@@ -4,6 +4,10 @@
     "children": [
         { "caption": "-", "id": "breakpoints" },
         { "command": "gdb_toggle_breakpoint", "caption": "Toggle Breakpoint" },
+        {
+            "caption": "Clear Breakpoints",
+            "command": "gdb_clear_breakpoints"
+        },
         { "command": "gdb_launch", "caption": "Run"},
         { "command": "gdb_load", "caption": "Load"},
         { "command": "gdb_pause", "caption": "Pause"},
@@ -53,10 +57,10 @@
             "caption": "Add watch",
             "command": "gdb_add_watch"
         },
-        {
-            "caption" : "Show Error Message",
-            "command" : "show_error_message"
-        }
+        // {
+        //     "caption" : "Show Error Message",
+        //     "command" : "show_error_message"
+        // }
     ]
 }
 ]
