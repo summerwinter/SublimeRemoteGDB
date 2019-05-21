@@ -79,6 +79,22 @@ This plugin replaces the simple configuration in SublimeGDB with more complex bu
 
 Each time if you want to debug one project, drag it into Sublime Text as one folder. Open any file in that folder, then start debugging. You should ensure the local source code is consistent with the remote source code.
 
+## Key bindings
+
+GDB key bindings
+* <kbd>F9</kbd> Set/Cancel breakpoint (also in context menu with right click)
+* <kbd>F5</kbd> Begin debugging; Continue
+* <kbd>F10</kbd>  Step over
+* <kbd>F11</kbd>  Step into
+* <kbd>Shift+F11</kbd>  Step out
+* <kbd>Ctrl+R</kbd> Advance
+* <kbd>Ctrl+F5</kbd>  Quit gdb
+* <kbd>Shift+F5</kbd> Show/Hide debug input
+
+Other key bindings
+* <kbd>Ctrl+B</kbd> Copy filename:line_number to quickly set breakpoint in gdb console
+* <kbd>Alt+P</kbd>  Show parent function/class
+
 ## Contributors
 
 * Xiaomei Liu
